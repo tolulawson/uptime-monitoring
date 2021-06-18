@@ -1,0 +1,21 @@
+{
+  "name": "uptime-monitoring",
+  "version": "1.0.0",
+  "description": "A tool for monitoring uptime of any URL",
+  "main": "app/index.js",
+  "author": "Tolu Lawson",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "NODE_ENV=dev nodemon app/index.js"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "yup": "^0.32.9"
+  }
+}

@@ -1,8 +1,8 @@
 const { StringDecoder } = require('string_decoder');
 const { URL } = require('url');
-const qs = require('querystring');
 const handlers = require('./handlers');
 const router = require('./router');
+const helpers = require('../lib/helpers');
 
 const unifiedServer = (req, res) => {
   const { headers } = req;
@@ -20,7 +20,7 @@ const unifiedServer = (req, res) => {
 
   req.on('end', () => {
     buffer += decoder.end();
-    const body = qs.parse(buffer);
+    const payload = helpers.parse(buffer);
     const chosenHandler = typeof (router[reqPath]) !== 'undefined' ? router[reqPath] : handlers.notFound;
 
     const data = {
@@ -28,21 +28,16 @@ const unifiedServer = (req, res) => {
       queryStringObject,
       headers,
       method,
-      payload: body,
+      payload,
     };
 
-    chosenHandler(data, (_statusCode, payload = {}) => {
+    chosenHandler(data, (_statusCode, _responseObject = {}) => {
       const statusCode = typeof _statusCode === 'number' ? _statusCode : 200;
-      const payloadString = JSON.stringify(payload);
+      const responseObjectString = JSON.stringify(_responseObject);
 
-      res.setHeader('Content-type', 'application/json');
-      res.writeHead(statusCode);
-      res.end(payloadString);
-
-      console.log('Returning response:', buffer);
+      res.writeHead(statusCode, { 'Content-type': 'application/json' });
+      res.end(responseObjectString);
     });
-
-    res.end('Hello world!\n');
   });
 };
 

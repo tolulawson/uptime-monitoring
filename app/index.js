@@ -1,7 +1,8 @@
+/* eslint-disable import/extensions */
 /* eslint-disable no-underscore-dangle */
-const http = require('http');
-const config = require('../app.config');
-const unifiedServer = require('./unifiedServer');
+import http from 'http';
+import config from '../app.config.js';
+import unifiedServer from './unifiedServer.js';
 
 const httpServer = http.createServer((req, res) => {
   unifiedServer(req, res);

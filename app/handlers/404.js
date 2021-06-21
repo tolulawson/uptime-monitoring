@@ -2,4 +2,4 @@ const notFound = (data, callback) => {
   callback(404);
 };
 
-module.exports = notFound;
+export default notFound;

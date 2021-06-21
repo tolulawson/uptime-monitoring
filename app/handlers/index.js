@@ -1,8 +1,9 @@
-const ping = require('./ping');
-const notFound = require('./404');
-const users = require('./users');
+/* eslint-disable import/extensions */
+import ping from './ping.js';
+import notFound from './404.js';
+import users from './users.js';
 
-module.exports = {
+export default {
   ping,
   notFound,
   users,

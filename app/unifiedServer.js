@@ -1,8 +1,9 @@
-const { StringDecoder } = require('string_decoder');
-const { URL } = require('url');
-const handlers = require('./handlers');
-const router = require('./router');
-const helpers = require('../lib/helpers');
+/* eslint-disable import/extensions */
+import { StringDecoder } from 'string_decoder';
+import { URL } from 'url';
+import handlers from './handlers/index.js';
+import router from './router.js';
+import helpers from '../lib/helpers.js';
 
 const unifiedServer = (req, res) => {
   const { headers } = req;
@@ -41,4 +42,4 @@ const unifiedServer = (req, res) => {
   });
 };
 
-module.exports = unifiedServer;
+export default unifiedServer;

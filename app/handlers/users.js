@@ -1,8 +1,9 @@
+/* eslint-disable import/extensions */
 /* eslint-disable no-shadow */
 /* eslint-disable no-underscore-dangle */
-const yup = require('yup');
-const helpers = require('../../lib/helpers');
-const { readDoc, createDoc } = require('../../lib/data');
+import yup from 'yup';
+import helpers from '../../lib/helpers.js';
+import { readDoc, createDoc } from '../../lib/data.js';
 
 const _users = {};
 
@@ -68,4 +69,4 @@ const users = (data, callback) => {
   }
 };
 
-module.exports = users;
+export default users;

@@ -18,4 +18,4 @@ environments.production = {
 const currentEnvironment = process.env.NODE_ENV || 'dev';
 const config = environments[currentEnvironment];
 
-module.exports = config;
+export default config;

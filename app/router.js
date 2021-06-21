@@ -1,8 +1,9 @@
-const handlers = require('./handlers');
+/* eslint-disable import/extensions */
+import handlers from './handlers/index.js';
 
 const router = {
   '/ping': handlers.ping,
   '/users': handlers.users,
 };
 
-module.exports = router;
+export default router;

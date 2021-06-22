@@ -11,7 +11,7 @@ const unifiedServer = (req, res) => {
   const reqUrl = new URL(req.url, baseURL);
   const { pathname: reqPath } = reqUrl;
   const method = req.method.toLowerCase();
-  const { query: queryStringObject } = reqUrl;
+  const queryStringObject = Object.fromEntries(reqUrl.searchParams);
 
   const decoder = new StringDecoder('utf-8');
   let buffer = '';
@@ -21,7 +21,7 @@ const unifiedServer = (req, res) => {
 
   req.on('end', () => {
     buffer += decoder.end();
-    const payload = helpers.parse(buffer);
+    const payload = helpers.parseRequestBody(buffer);
     const chosenHandler = typeof (router[reqPath]) !== 'undefined' ? router[reqPath] : handlers.notFound;
 
     const data = {

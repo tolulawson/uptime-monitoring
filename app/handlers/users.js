@@ -7,6 +7,7 @@ import helpers from '../../lib/helpers.js';
 import {
   readDoc, createDoc, updateDoc, deleteDoc,
 } from '../../lib/data.js';
+import handlers from './index.js';
 
 const _users = {};
 
@@ -26,6 +27,7 @@ _users.post = (_data, callback) => {
     phone: yup.string().trim().required().min(10),
     email: yup.string().trim().lowercase().email().required(),
     password: yup.string().trim().required(),
+    tosAgreement: yup.boolean().required().oneOf([true]),
   });
 
   const { payload } = _data;
@@ -39,7 +41,6 @@ _users.post = (_data, callback) => {
           const userObject = {
             ...payload,
             password: hashedPass,
-            tosAgreement: true,
           };
           createDoc('users', payload.email, userObject, (err) => {
             if (!err) {
@@ -65,17 +66,23 @@ _users.get = (_data, callback) => {
     email: yup.string().email().required(),
   });
   const valid = queryStringSchema.isValidSync(_data.queryStringObject);
-
   if (valid) {
+    const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
     const { email } = _data.queryStringObject;
-    readDoc('users', email, (err, data) => {
-      if (!err && data) {
-        const dataWithoutPass = { ...data };
-        delete dataWithoutPass.password;
-        delete dataWithoutPass.tosAgreement;
-        callback(200, dataWithoutPass);
+    handlers.tokens.verifyToken(token, email, (tokenValid) => {
+      if (tokenValid) {
+        readDoc('users', email, (err, data) => {
+          if (!err && data) {
+            const dataWithoutPass = { ...data };
+            delete dataWithoutPass.password;
+            delete dataWithoutPass.tosAgreement;
+            callback(200, dataWithoutPass);
+          } else {
+            callback(404, {});
+          }
+        });
       } else {
-        callback(404, {});
+        callback(403, { Error: 'Missing required token in header or token is invalid' });
       }
     });
   } else {
@@ -95,24 +102,34 @@ _users.put = (_data, callback) => {
   const valid = putSchema.isValidSync(payload);
 
   if (valid) {
-    readDoc('users', payload.email, (err, data) => {
-      if (!err && data) {
-        const update = { ...payload };
-        delete update.email;
-        const updatedUser = {
-          ...data,
-          ...update,
-        };
+    const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
+    handlers.tokens.verifyToken(token, payload.email, (tokenValid) => {
+      if (tokenValid) {
+        readDoc('users', payload.email, (err, data) => {
+          if (!err && data) {
+            const update = { ...payload };
+            if (typeof update.password === 'string') {
+              update.password = helpers.hash(update.password);
+            }
+            delete update.email;
+            const updatedUser = {
+              ...data,
+              ...update,
+            };
 
-        updateDoc('users', payload.email, updatedUser, (err) => {
-          if (!err) {
-            callback(200);
+            updateDoc('users', payload.email, updatedUser, (err) => {
+              if (!err) {
+                callback(200);
+              } else {
+                callback(500, { Error: 'Could not update the user' });
+              }
+            });
           } else {
-            callback(500, { Error: 'Could not update the user' });
+            callback(400, { Error: 'The specified user does not exist' });
           }
         });
       } else {
-        callback(400, { Error: 'The specified user does not exist' });
+        callback(403, { Error: 'Missing required token in header or token is invalid' });
       }
     });
   } else {
@@ -128,17 +145,24 @@ _users.delete = (_data, callback) => {
   const valid = deleteSchema.isValidSync(payload);
 
   if (valid) {
-    readDoc('users', payload.email, (err, data) => {
-      if (!err && data) {
-        deleteDoc('users', payload.email, (err) => {
-          if (!err) {
-            callback(200);
+    const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
+    handlers.tokens.verifyToken(token, payload.email, (tokenValid) => {
+      if (tokenValid) {
+        readDoc('users', payload.email, (err, data) => {
+          if (!err && data) {
+            deleteDoc('users', payload.email, (err) => {
+              if (!err) {
+                callback(200);
+              } else {
+                callback(500, { Error: 'Unable to delete user' });
+              }
+            });
           } else {
-            callback(500, { Error: 'Unable to delete user' });
+            callback(400, { Error: 'The specified user does not exist' });
           }
         });
       } else {
-        callback(400, { Error: 'The specified user does not exist' });
+        callback(403, { Error: 'Missing required token in header or token is invalid' });
       }
     });
   } else {

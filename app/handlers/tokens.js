@@ -19,6 +19,7 @@ const tokens = (data, callback) => {
   }
 };
 
+// -- verify a given token id and email, and ensure expiry date
 tokens.verifyToken = (id, email, callback) => {
   readDoc('tokens', id, (err, data) => {
     if (!err && data) {
@@ -33,6 +34,7 @@ tokens.verifyToken = (id, email, callback) => {
   });
 };
 
+// -- generate a token given a username and password (essentially a sign in)
 _tokens.post = (_data, callback) => {
   const postSchema = yup.object().shape({
     email: yup.string().trim().lowercase().email().required(),
@@ -60,7 +62,7 @@ _tokens.post = (_data, callback) => {
             if (!err) {
               callback(200, tokenObj);
             } else {
-              callback(500, { Error: 'COuld not create the new token' });
+              callback(500, { Error: 'Could not create the new token' });
             }
           });
         } else {
@@ -75,6 +77,7 @@ _tokens.post = (_data, callback) => {
   }
 };
 
+// -- confirm that a token is valid given the id
 _tokens.get = (_data, callback) => {
   const queryStringSchema = yup.object().shape({
     id: yup.string().required().length(20),
@@ -95,6 +98,7 @@ _tokens.get = (_data, callback) => {
   }
 };
 
+// -- Extend the validity of a token given the id
 _tokens.put = (_data, callback) => {
   const putSchema = yup.object().shape({
     id: yup.string().required().length(20),
@@ -130,6 +134,7 @@ _tokens.put = (_data, callback) => {
   }
 };
 
+// -- Delete a token given the id
 _tokens.delete = (_data, callback) => {
   const deleteSchema = yup.object().shape({
     id: yup.string().required().length(20),

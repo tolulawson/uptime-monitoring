@@ -6,6 +6,7 @@ environments.dev = {
   httpsPort: 4001,
   envName: 'dev',
   hashingSecret: 'myLittleSecret',
+  maxChecks: 5,
 };
 
 environments.production = {
@@ -13,6 +14,7 @@ environments.production = {
   httpsPort: 5001,
   envName: 'production',
   hashingSecret: 'myLittleSecretest',
+  maxChecks: 5,
 };
 
 const currentEnvironment = process.env.NODE_ENV || 'dev';

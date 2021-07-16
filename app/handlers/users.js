@@ -7,7 +7,7 @@ import helpers from '../../lib/helpers.js';
 import {
   readDoc, createDoc, updateDoc, deleteDoc,
 } from '../../lib/data.js';
-import handlers from './index.js';
+import tokens from './tokens.js';
 
 const _users = {};
 
@@ -19,6 +19,8 @@ const users = (data, callback) => {
     callback(405);
   }
 };
+
+// -- Create a new user
 
 _users.post = (_data, callback) => {
   const postSchema = yup.object().shape({
@@ -61,6 +63,8 @@ _users.post = (_data, callback) => {
   }
 };
 
+// -- Get a given user, given a valid token in header
+
 _users.get = (_data, callback) => {
   const queryStringSchema = yup.object().shape({
     email: yup.string().email().required(),
@@ -69,7 +73,7 @@ _users.get = (_data, callback) => {
   if (valid) {
     const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
     const { email } = _data.queryStringObject;
-    handlers.tokens.verifyToken(token, email, (tokenValid) => {
+    tokens.verifyToken(token, email, (tokenValid) => {
       if (tokenValid) {
         readDoc('users', email, (err, data) => {
           if (!err && data) {
@@ -90,6 +94,7 @@ _users.get = (_data, callback) => {
   }
 };
 
+// given a valid token and user email, update user details
 _users.put = (_data, callback) => {
   const putSchema = yup.object().shape({
     email: yup.string().email().required(),
@@ -103,7 +108,7 @@ _users.put = (_data, callback) => {
 
   if (valid) {
     const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
-    handlers.tokens.verifyToken(token, payload.email, (tokenValid) => {
+    tokens.verifyToken(token, payload.email, (tokenValid) => {
       if (tokenValid) {
         readDoc('users', payload.email, (err, data) => {
           if (!err && data) {
@@ -137,6 +142,8 @@ _users.put = (_data, callback) => {
   }
 };
 
+// -- given a valid token and user email, delete the user
+
 _users.delete = (_data, callback) => {
   const deleteSchema = yup.object().shape({
     email: yup.string().email().required(),
@@ -146,7 +153,7 @@ _users.delete = (_data, callback) => {
 
   if (valid) {
     const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
-    handlers.tokens.verifyToken(token, payload.email, (tokenValid) => {
+    tokens.verifyToken(token, payload.email, (tokenValid) => {
       if (tokenValid) {
         readDoc('users', payload.email, (err, data) => {
           if (!err && data) {

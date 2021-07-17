@@ -101,7 +101,8 @@ _users.put = (_data, callback) => {
     firstName: yup.string(),
     lastName: yup.string(),
     phone: yup.string().min(10),
-  }).test('at least one', 'Provide valid update data', (value) => !!(value.firstName || value.lastName || value.phone));
+    password: yup.string(),
+  }).test('at least one', 'Provide valid update data', (value) => !!(value.firstName || value.lastName || value.phone || value.password));
 
   const { payload } = _data;
   const valid = putSchema.isValidSync(payload);

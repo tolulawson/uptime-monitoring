@@ -27,7 +27,7 @@ _checks.post = (_data, callback) => {
     url: yup.string().trim().url().required(),
     method: yup.string().trim().lowercase().oneOf(['get', 'post', 'put', 'delete']).required(),
     successCodes: yup.array().of(yup.number()).required(),
-    timeoutSeconds: yup.number().positive().integer().max(5),
+    timeoutSeconds: yup.number().positive().integer().min(1).max(5),
   });
 
   const { payload } = _data;
@@ -35,11 +35,18 @@ _checks.post = (_data, callback) => {
   const valid = postSchema.isValidSync(payload);
   if (valid) {
     const token = typeof _data.headers.token === 'string' ? _data.headers.token : null;
-    readDoc('tokens', (err, tokenData) => {
-      
-    })
+    readDoc('tokens', token, (err, tokenData) => {
+      if (!err && tokenData && tokenData.expires > Date.now()) {
+        readDoc('users', tokenData.email, (err, userData) => {
+          
+        })
+        });
+      } else {
+        callback(403, { Error: 'Invalid or missing token' });
+      }
+    });
   } else {
-    callback(400, { Error: 'Missing required fields' });
+    callback(400, { Error: 'Missing required inputs, or inputs are invalid' });
   }
 };
 

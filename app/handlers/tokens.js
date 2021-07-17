@@ -51,7 +51,7 @@ _tokens.post = (_data, callback) => {
         const hashedPass = helpers.hash(payload.password);
         if (hashedPass === data.password) {
           const tokenId = helpers.createRandomString(20);
-          const expires = Date.now() + (1000 * 60 * 60);
+          const expires = Date.now() + (30 * 24 * 60 * 60 * 1000);
           const tokenObj = {
             email: payload.email,
             id: tokenId,
@@ -113,7 +113,7 @@ _tokens.put = (_data, callback) => {
         if (tokenData.expires > Date.now()) {
           const newTokenObject = {
             ...tokenData,
-            expires: tokenData.expires + (60 * 60 * 1000),
+            expires: tokenData.expires + (30 * 24 * 60 * 60 * 1000),
           };
           updateDoc('tokens', payload.id, newTokenObject, (err) => {
             if (!err) {
